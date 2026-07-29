@@ -1,33 +1,17 @@
 /* ==========================================================================
    app.js — renderiza a página pública
+   Os dados vêm do Firebase (nuvem). Qualquer alteração feita no admin
+   aparece aqui automaticamente, em qualquer aparelho, sem precisar recarregar.
    ========================================================================== */
 
-const STORAGE_KEY = "cha_casa_nova_overrides_v1";
+import {
+  subscribeConfig,
+  subscribeItems,
+  seedIfEmpty,
+} from "./firebase-config.js";
 
-function loadOverrides() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : null;
-  } catch (e) {
-    return null;
-  }
-}
-
-function getConfig() {
-  const overrides = loadOverrides();
-  if (overrides && overrides.config) {
-    return { ...SITE_CONFIG, ...overrides.config };
-  }
-  return SITE_CONFIG;
-}
-
-function getItems() {
-  const overrides = loadOverrides();
-  if (overrides && overrides.items) {
-    return overrides.items;
-  }
-  return DEFAULT_ITEMS;
-}
+let currentConfig = SITE_CONFIG;
+let currentItems = DEFAULT_ITEMS;
 
 function formatBRL(value) {
   return value.toLocaleString("pt-BR", {
@@ -37,7 +21,7 @@ function formatBRL(value) {
 }
 
 function renderHero() {
-  const cfg = getConfig();
+  const cfg = currentConfig;
   document.getElementById("hero-title").textContent = cfg.eventTitle;
   document.getElementById("hero-names").textContent = cfg.couple;
   document.getElementById("hero-intro").textContent = cfg.intro;
@@ -52,8 +36,8 @@ function itemMediaHTML(item) {
 }
 
 function renderItems() {
-  const items = getItems();
-  const cfg = getConfig();
+  const items = currentItems;
+  const cfg = currentConfig;
   const grid = document.getElementById("items-grid");
   grid.innerHTML = items
     .map((item, idx) => {
@@ -115,7 +99,7 @@ function renderItems() {
 }
 
 function openModal(item, amount) {
-  const cfg = getConfig();
+  const cfg = currentConfig;
   document.getElementById("modal-item-name").textContent = item.name;
   document.getElementById("modal-amount").textContent = formatBRL(amount);
   document.getElementById("pix-key").textContent = cfg.pixKey;
@@ -140,16 +124,34 @@ function showToast(msg) {
 }
 
 function copyPix() {
-  const cfg = getConfig();
+  const cfg = currentConfig;
   navigator.clipboard
     .writeText(cfg.pixKey)
     .then(() => showToast("Chave Pix copiada!"))
     .catch(() => showToast("Não foi possível copiar. Copie manualmente."));
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+  // Mostra os dados padrão imediatamente, enquanto busca os dados da nuvem
   renderHero();
   renderItems();
+
+  try {
+    await seedIfEmpty(SITE_CONFIG, DEFAULT_ITEMS);
+  } catch (e) {
+    console.error("Erro ao inicializar dados na nuvem:", e);
+  }
+
+  // Atualiza em tempo real sempre que algo mudar no admin
+  subscribeConfig((cfg) => {
+    currentConfig = cfg || SITE_CONFIG;
+    renderHero();
+  });
+  subscribeItems((items) => {
+    currentItems = items.length ? items : DEFAULT_ITEMS;
+    renderItems();
+  });
+
   document.getElementById("modal-close").addEventListener("click", closeModal);
   document.getElementById("modal-overlay").addEventListener("click", (e) => {
     if (e.target.id === "modal-overlay") closeModal();
