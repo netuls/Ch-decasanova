@@ -18,14 +18,12 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyC-pWCZqu_wqghj65pix_kOIh_BkuNaOOM",
-  authDomain: "banco-cw.firebaseapp.com",
-  databaseURL: "https://banco-cw-default-rtdb.firebaseio.com",
-  projectId: "banco-cw",
-  storageBucket: "banco-cw.firebasestorage.app",
-  messagingSenderId: "1005772037818",
-  appId: "1:1005772037818:web:16a25547fc336c5b45ac83",
-  measurementId: "G-11R6LQ18ST",
+  apiKey: "AIzaSyCR9Q64qPoFnCVfP-pk8W2WXOMIqWfb2C4",
+  authDomain: "studio-7657884807-a9c5c.firebaseapp.com",
+  projectId: "studio-7657884807-a9c5c",
+  storageBucket: "studio-7657884807-a9c5c.firebasestorage.app",
+  messagingSenderId: "856112416962",
+  appId: "1:856112416962:web:be48193adb8dd587c9135b",
 };
 
 const app = initializeApp(firebaseConfig);
