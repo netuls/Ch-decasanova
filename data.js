@@ -1,12 +1,12 @@
 /* ==========================================================================
    data.js
-   Configuração do evento e lista de itens.
+   Valores padrão / de exemplo, usados apenas:
+   - na primeira vez que o site roda, para popular o banco de dados (Firebase);
+   - como reserva, caso o site fique sem internet por um instante.
 
-   Para atualizar o site para TODOS os visitantes (não só no seu navegador):
-   1. Entre em /admin.html e faça as alterações (fotos, nomes, valores).
-   2. Clique em "Gerar código atualizado" e copie o texto gerado.
-   3. Substitua o conteúdo deste arquivo (js/data.js) pelo texto copiado.
-   4. Salve, faça commit e push para o GitHub. O GitHub Pages atualiza sozinho.
+   Depois que o banco é populado, todas as edições passam a ser feitas
+   direto pelo admin.html e salvas na nuvem — não precisa mais editar
+   este arquivo manualmente nem mexer no GitHub.
    ========================================================================== */
 
 const SITE_CONFIG = {
