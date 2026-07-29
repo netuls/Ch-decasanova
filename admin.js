@@ -17,11 +17,20 @@ const ADMIN_PASSWORD = "casanova2026"; // troque aqui por sua senha
 let workingItems = [];
 let workingConfig = {};
 
+function withTimeout(promise, ms) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error("Tempo esgotado ao falar com a nuvem")), ms)
+    ),
+  ]);
+}
+
 async function loadState() {
   try {
-    await seedIfEmpty(SITE_CONFIG, DEFAULT_ITEMS);
-    const remoteConfig = await fetchRemoteConfig();
-    const remoteItems = await fetchRemoteItems();
+    await withTimeout(seedIfEmpty(SITE_CONFIG, DEFAULT_ITEMS), 8000);
+    const remoteConfig = await withTimeout(fetchRemoteConfig(), 8000);
+    const remoteItems = await withTimeout(fetchRemoteItems(), 8000);
     workingConfig = { ...SITE_CONFIG, ...(remoteConfig || {}) };
     workingItems = remoteItems.length
       ? remoteItems
@@ -30,7 +39,7 @@ async function loadState() {
     console.error("Erro ao carregar dados da nuvem:", e);
     workingConfig = { ...SITE_CONFIG };
     workingItems = JSON.parse(JSON.stringify(DEFAULT_ITEMS));
-    toast("Não consegui conectar à nuvem. Verifique sua internet.");
+    toast("Não consegui conectar à nuvem (verifique sua internet). Mostrando valores padrão — clique em Salvar para aplicá-los.");
   }
 }
 
