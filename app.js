@@ -28,9 +28,45 @@ function renderHero() {
   document.getElementById("hero-intro").textContent = cfg.intro;
   document.title = `${cfg.eventTitle} — ${cfg.couple}`;
 
-  const photoEl = document.getElementById("intro-photo");
-  photoEl.src = cfg.couplePhoto || "casal.jpg?v=1";
-  photoEl.alt = cfg.couple;
+  const splashTitle = document.getElementById("splash-title");
+  const splashNames = document.getElementById("splash-names");
+  const splashPhoto = document.getElementById("splash-photo");
+  if (splashTitle) splashTitle.textContent = cfg.eventTitle;
+  if (splashNames) splashNames.textContent = cfg.couple;
+  if (splashPhoto) {
+    splashPhoto.src = cfg.couplePhoto || "casal.jpg?v=1";
+    splashPhoto.alt = cfg.couple;
+  }
+}
+
+function initSplash() {
+  const splash = document.getElementById("splash");
+  const enterBtn = document.getElementById("splash-enter");
+  if (!splash) return;
+
+  document.documentElement.classList.add("no-scroll");
+
+  const dismiss = () => {
+    splash.classList.add("is-hidden");
+    document.documentElement.classList.remove("no-scroll");
+    splash.removeEventListener("click", onBackdropClick);
+    document.removeEventListener("keydown", onKeydown);
+    setTimeout(() => splash.remove(), 950);
+  };
+
+  const onBackdropClick = (e) => {
+    if (e.target === splash) dismiss();
+  };
+  const onKeydown = (e) => {
+    if (e.key === "Enter" || e.key === "Escape") dismiss();
+  };
+
+  enterBtn?.addEventListener("click", dismiss);
+  splash.addEventListener("click", onBackdropClick);
+  document.addEventListener("keydown", onKeydown);
+
+  // Transição automática caso o visitante não interaja
+  setTimeout(dismiss, 6500);
 }
 
 function itemMediaHTML(item) {
@@ -182,6 +218,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Mostra os dados padrão imediatamente, enquanto busca os dados da nuvem
   renderHero();
   renderItems();
+  initSplash();
 
   // Listeners essenciais de UI: registrados JÁ, sem depender da nuvem,
   // pra nunca ficar "travado" esperando o Firebase responder.
