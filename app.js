@@ -8,6 +8,7 @@ import {
   subscribeConfig,
   subscribeItems,
   seedIfEmpty,
+  saveContribution,
 } from "./firebase-config.js";
 
 let currentConfig = SITE_CONFIG;
@@ -98,18 +99,60 @@ function renderItems() {
   });
 }
 
+let pendingContribution = null;
+
 function openModal(item, amount) {
   const cfg = currentConfig;
+  pendingContribution = { itemName: item.name, amount };
+
+  document.getElementById("modal-title").textContent = "Quase lá! 💛";
   document.getElementById("modal-item-name").textContent = item.name;
   document.getElementById("modal-amount").textContent = formatBRL(amount);
   document.getElementById("pix-key").textContent = cfg.pixKey;
 
-  const waMsg = encodeURIComponent(
-    `Oi! Quero contribuir com ${formatBRL(amount)} para o ${item.name} do chá de casa nova de ${cfg.couple} 🎁`
-  );
-  document.getElementById("whatsapp-link").href = `https://wa.me/${cfg.whatsapp}?text=${waMsg}`;
+  const nameInput = document.getElementById("contributor-name");
+  nameInput.value = "";
+  nameInput.disabled = false;
+  document.getElementById("name-error").classList.remove("show");
+
+  const confirmBtn = document.getElementById("confirm-contribution-btn");
+  confirmBtn.disabled = false;
+  confirmBtn.textContent = "Confirmar contribuição";
 
   document.getElementById("modal-overlay").classList.add("open");
+  nameInput.focus();
+}
+
+async function confirmContribution() {
+  const nameInput = document.getElementById("contributor-name");
+  const errorEl = document.getElementById("name-error");
+  const confirmBtn = document.getElementById("confirm-contribution-btn");
+  const name = nameInput.value.trim();
+
+  if (!name) {
+    errorEl.classList.add("show");
+    nameInput.focus();
+    return;
+  }
+  errorEl.classList.remove("show");
+
+  if (!pendingContribution) return;
+
+  confirmBtn.disabled = true;
+  confirmBtn.textContent = "Enviando...";
+
+  try {
+    await saveContribution({ name, ...pendingContribution });
+    document.getElementById("modal-title").textContent = "Obrigado! 💛";
+    nameInput.disabled = true;
+    confirmBtn.textContent = "Contribuição registrada ✔";
+    showToast(`Obrigado, ${name}! Sua contribuição foi registrada 💛`);
+  } catch (e) {
+    console.error("Erro ao registrar contribuição:", e);
+    confirmBtn.disabled = false;
+    confirmBtn.textContent = "Confirmar contribuição";
+    showToast("Não foi possível registrar agora. Tente novamente.");
+  }
 }
 
 function closeModal() {
@@ -146,6 +189,12 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.key === "Escape") closeModal();
   });
   document.getElementById("copy-pix-btn").addEventListener("click", copyPix);
+  document
+    .getElementById("confirm-contribution-btn")
+    .addEventListener("click", confirmContribution);
+  document.getElementById("contributor-name").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") confirmContribution();
+  });
 
   // Agora sim, conversa com a nuvem (não bloqueia mais a interface)
   initCloud();
