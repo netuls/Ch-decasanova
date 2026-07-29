@@ -156,5 +156,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("modal-overlay").addEventListener("click", (e) => {
     if (e.target.id === "modal-overlay") closeModal();
   });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeModal();
+  });
   document.getElementById("copy-pix-btn").addEventListener("click", copyPix);
 });
