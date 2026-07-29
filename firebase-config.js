@@ -12,8 +12,11 @@ import {
   getDoc,
   getDocs,
   setDoc,
+  addDoc,
   onSnapshot,
   collection,
+  query,
+  orderBy,
   writeBatch,
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
@@ -31,6 +34,7 @@ export const db = getFirestore(app);
 
 const configDocRef = doc(db, "chaDeCasaNova", "config");
 const itemsColRef = collection(db, "chaDeCasaNova", "config", "items");
+const contributionsColRef = collection(db, "chaDeCasaNova", "config", "contributions");
 
 export async function fetchRemoteConfig() {
   const snap = await getDoc(configDocRef);
@@ -70,6 +74,28 @@ export async function saveRemoteItems(items) {
     batch.set(ref, rest, { merge: true });
   });
   await batch.commit();
+}
+
+// Registra uma contribuição feita por um convidado (nome + item + valor).
+// Fica salvo na nuvem e aparece na hora no painel admin.
+export async function saveContribution({ name, itemName, amount }) {
+  await addDoc(contributionsColRef, {
+    name,
+    itemName,
+    amount,
+    createdAt: Date.now(),
+  });
+}
+
+// Escuta em tempo real todas as contribuições registradas, da mais recente
+// para a mais antiga — usado no painel admin.
+export function subscribeContributions(callback) {
+  const q = query(contributionsColRef, orderBy("createdAt", "desc"));
+  return onSnapshot(q, (snap) => {
+    const list = [];
+    snap.forEach((d) => list.push({ id: d.id, ...d.data() }));
+    callback(list);
+  });
 }
 
 // Na primeira vez que o site roda, se o banco ainda estiver vazio,
