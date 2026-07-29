@@ -131,11 +131,27 @@ function copyPix() {
     .catch(() => showToast("Não foi possível copiar. Copie manualmente."));
 }
 
-document.addEventListener("DOMContentLoaded", async () => {
+document.addEventListener("DOMContentLoaded", () => {
   // Mostra os dados padrão imediatamente, enquanto busca os dados da nuvem
   renderHero();
   renderItems();
 
+  // Listeners essenciais de UI: registrados JÁ, sem depender da nuvem,
+  // pra nunca ficar "travado" esperando o Firebase responder.
+  document.getElementById("modal-close").addEventListener("click", closeModal);
+  document.getElementById("modal-overlay").addEventListener("click", (e) => {
+    if (e.target.id === "modal-overlay") closeModal();
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeModal();
+  });
+  document.getElementById("copy-pix-btn").addEventListener("click", copyPix);
+
+  // Agora sim, conversa com a nuvem (não bloqueia mais a interface)
+  initCloud();
+});
+
+async function initCloud() {
   try {
     await seedIfEmpty(SITE_CONFIG, DEFAULT_ITEMS);
   } catch (e) {
@@ -151,13 +167,4 @@ document.addEventListener("DOMContentLoaded", async () => {
     currentItems = items.length ? items : DEFAULT_ITEMS;
     renderItems();
   });
-
-  document.getElementById("modal-close").addEventListener("click", closeModal);
-  document.getElementById("modal-overlay").addEventListener("click", (e) => {
-    if (e.target.id === "modal-overlay") closeModal();
-  });
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") closeModal();
-  });
-  document.getElementById("copy-pix-btn").addEventListener("click", copyPix);
-});
+}
