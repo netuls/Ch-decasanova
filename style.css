@@ -466,6 +466,19 @@ a {
   text-decoration-color: var(--pink-mid);
 }
 
+.admin-discreet-link {
+  display: inline-block;
+  margin-top: 6px;
+  color: #e8e8e8;
+  font-size: 0.75rem;
+  text-decoration: none;
+  opacity: 0.5;
+}
+
+.admin-discreet-link:hover {
+  opacity: 1;
+}
+
 /* ---------- Toast ---------- */
 
 .toast {
