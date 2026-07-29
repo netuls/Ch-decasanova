@@ -19,7 +19,6 @@ const SITE_CONFIG = {
     "Estamos montando nosso ninho e cada ajuda torna essa casa mais nossa. Escolha um item, contribua com o valor que puder e faça parte dessa nova fase com a gente!",
   pixKey: "85989625699",
   pixOwner: "Letícia & Agapito",
-  whatsapp: "5585999999999",
   suggestedAmounts: [100, 200],
 };
 
