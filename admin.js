@@ -90,6 +90,25 @@ function resizeImage(file, maxWidth = 700, quality = 0.7) {
 function renderConfigForm() {
   const el = document.getElementById("config-form");
   el.innerHTML = `
+    <label class="full">Foto do casal (medalhão da capa)
+      <div class="couple-photo-editor">
+        <div class="couple-photo-preview">
+          ${
+            workingConfig.couplePhoto
+              ? `<img src="${workingConfig.couplePhoto}" alt="Foto do casal" />`
+              : `<img src="casal.jpg?v=1" alt="Foto padrão" />`
+          }
+        </div>
+        <div class="couple-photo-actions">
+          <input type="file" accept="image/*" id="couple-photo-input" />
+          ${
+            workingConfig.couplePhoto
+              ? `<button type="button" id="remove-couple-photo-btn" class="remove-img-btn">Usar foto padrão</button>`
+              : `<span class="couple-photo-hint">Nenhuma foto enviada — usando a padrão do repositório</span>`
+          }
+        </div>
+      </div>
+    </label>
     <label>Título do evento
       <input type="text" data-field="eventTitle" value="${workingConfig.eventTitle}" />
     </label>
@@ -117,6 +136,22 @@ function renderConfigForm() {
       workingConfig[input.dataset.field] = input.value;
     });
   });
+
+  document.getElementById("couple-photo-input").addEventListener("change", async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const dataUrl = await resizeImage(file, 700, 0.75);
+    workingConfig.couplePhoto = dataUrl;
+    renderConfigForm();
+  });
+
+  const removeBtn = document.getElementById("remove-couple-photo-btn");
+  if (removeBtn) {
+    removeBtn.addEventListener("click", () => {
+      workingConfig.couplePhoto = null;
+      renderConfigForm();
+    });
+  }
 }
 
 function renderItemsForm() {
