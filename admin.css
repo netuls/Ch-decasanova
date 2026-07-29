@@ -299,6 +299,43 @@
   padding: 24px 18px;
 }
 
+.contributions-table td.contributions-actions {
+  white-space: nowrap;
+}
+
+.table-action-btn {
+  border: none;
+  background: var(--pink-deep);
+  color: #fff;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: 0.76rem;
+  padding: 7px 11px;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-right: 6px;
+}
+
+.table-action-btn.ghost {
+  background: transparent;
+  border: 1.5px solid var(--cream-deep);
+  color: var(--ink-soft);
+}
+
+.table-action-btn.danger {
+  background: #c0392b;
+}
+
+.edit-amount-input {
+  font-family: inherit;
+  font-size: 0.88rem;
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 1.5px solid var(--pink-mid);
+  width: 110px;
+  outline: none;
+}
+
 @media (max-width: 560px) {
   .admin-item-card {
     grid-template-columns: 1fr;
