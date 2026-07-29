@@ -468,15 +468,16 @@ a {
 
 .admin-discreet-link {
   display: inline-block;
-  margin-top: 6px;
-  color: #e8e8e8;
-  font-size: 0.75rem;
+  margin-top: 10px;
+  padding: 4px 10px;
+  color: var(--ink-soft);
+  font-size: 0.78rem;
   text-decoration: none;
-  opacity: 0.5;
+  opacity: 0.45;
 }
 
 .admin-discreet-link:hover {
-  opacity: 1;
+  opacity: 0.9;
 }
 
 /* ---------- Toast ---------- */
