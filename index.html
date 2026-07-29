@@ -33,14 +33,19 @@
 <div class="modal-overlay" id="modal-overlay">
   <div class="modal">
     <button class="modal-close" id="modal-close" aria-label="Fechar">&times;</button>
-    <h3>Obrigado! 💛</h3>
+    <h3 id="modal-title">Quase lá! 💛</h3>
     <p>Sua contribuição para <strong id="modal-item-name"></strong> significa muito para nós.</p>
     <div class="modal-amount" id="modal-amount"></div>
     <div class="pix-box">
       <code id="pix-key"></code>
       <button class="copy-btn" id="copy-pix-btn">Copiar chave</button>
     </div>
-    <a class="whatsapp-btn" id="whatsapp-link" target="_blank" rel="noopener">Avisar pelo WhatsApp</a>
+    <label class="name-field">
+      <span>Seu nome *</span>
+      <input type="text" id="contributor-name" placeholder="Digite seu nome" autocomplete="name" />
+    </label>
+    <p class="field-error" id="name-error">Por favor, informe seu nome para confirmar.</p>
+    <button class="contribute-btn confirm-btn" id="confirm-contribution-btn">Confirmar contribuição</button>
   </div>
 </div>
 
