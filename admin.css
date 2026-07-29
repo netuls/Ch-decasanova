@@ -252,6 +252,53 @@
   color: var(--ink);
 }
 
+.contributions-summary {
+  font-weight: 700;
+  color: var(--pink-deep);
+  margin-bottom: 14px;
+  font-size: 0.95rem;
+}
+
+.contributions-table-wrap {
+  background: var(--paper);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+  padding: 6px 0;
+  overflow-x: auto;
+}
+
+.contributions-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.contributions-table th,
+.contributions-table td {
+  text-align: left;
+  padding: 12px 18px;
+  white-space: nowrap;
+}
+
+.contributions-table th {
+  color: var(--ink-soft);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  border-bottom: 1.5px solid var(--cream-deep);
+}
+
+.contributions-table tbody tr:not(:last-child) {
+  border-bottom: 1px solid var(--cream-deep);
+}
+
+.contributions-table td.empty-row {
+  color: var(--ink-soft);
+  white-space: normal;
+  text-align: center;
+  padding: 24px 18px;
+}
+
 @media (max-width: 560px) {
   .admin-item-card {
     grid-template-columns: 1fr;
