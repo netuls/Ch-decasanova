@@ -11,7 +11,9 @@ import {
   saveRemoteItems,
   seedIfEmpty,
   subscribeContributions,
-} from "./firebase-config.js?v=2";
+  updateContribution,
+  deleteContribution,
+} from "./firebase-config.js?v=3";
 
 const ADMIN_PASSWORD = "casanova2026"; // troque aqui por sua senha
 
@@ -190,13 +192,16 @@ function formatDate(timestamp) {
 }
 
 let contributionsUnsubscribe = null;
+let latestContributions = [];
+let editingContributionId = null;
 
 function renderContributions(list) {
+  latestContributions = list;
   const tbody = document.getElementById("contributions-tbody");
   const summary = document.getElementById("contributions-summary");
 
   if (!list.length) {
-    tbody.innerHTML = `<tr><td colspan="4" class="empty-row">Nenhuma contribuição registrada ainda.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="5" class="empty-row">Nenhuma contribuição registrada ainda.</td></tr>`;
     summary.textContent = "0 contribuições — total: R$ 0,00";
     return;
   }
@@ -205,16 +210,82 @@ function renderContributions(list) {
   summary.textContent = `${list.length} contribuição${list.length > 1 ? "ões" : ""} — total: ${formatBRL(total)}`;
 
   tbody.innerHTML = list
-    .map(
-      (c) => `
+    .map((c) => {
+      const isEditing = editingContributionId === c.id;
+      const valorCell = isEditing
+        ? `<input type="number" min="0" step="1" class="edit-amount-input" data-id="${c.id}" value="${Number(c.amount || 0)}" />`
+        : formatBRL(c.amount);
+      const actionsCell = isEditing
+        ? `<button type="button" class="table-action-btn save-contribution-btn" data-id="${c.id}">Salvar</button>
+           <button type="button" class="table-action-btn ghost cancel-contribution-btn">Cancelar</button>`
+        : `<button type="button" class="table-action-btn edit-contribution-btn" data-id="${c.id}">Editar</button>
+           <button type="button" class="table-action-btn danger delete-contribution-btn" data-id="${c.id}">Excluir</button>`;
+      return `
     <tr>
       <td>${c.name || "—"}</td>
       <td>${c.itemName || "—"}</td>
-      <td>${formatBRL(c.amount)}</td>
+      <td>${valorCell}</td>
       <td>${formatDate(c.createdAt)}</td>
-    </tr>`
-    )
+      <td class="contributions-actions">${actionsCell}</td>
+    </tr>`;
+    })
     .join("");
+
+  tbody.querySelectorAll(".edit-contribution-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      editingContributionId = btn.dataset.id;
+      renderContributions(latestContributions);
+    });
+  });
+
+  tbody.querySelectorAll(".cancel-contribution-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      editingContributionId = null;
+      renderContributions(latestContributions);
+    });
+  });
+
+  tbody.querySelectorAll(".save-contribution-btn").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const id = btn.dataset.id;
+      const input = tbody.querySelector(`.edit-amount-input[data-id="${id}"]`);
+      const newAmount = parseFloat(input.value);
+      if (!newAmount || newAmount <= 0) {
+        toast("Digite um valor válido antes de salvar.");
+        return;
+      }
+      btn.disabled = true;
+      btn.textContent = "Salvando...";
+      try {
+        await updateContribution(id, { amount: newAmount });
+        editingContributionId = null;
+        toast("Valor atualizado ✅");
+      } catch (e) {
+        console.error("Erro ao atualizar contribuição:", e);
+        toast("Erro ao salvar. Tente de novo.");
+        btn.disabled = false;
+        btn.textContent = "Salvar";
+      }
+    });
+  });
+
+  tbody.querySelectorAll(".delete-contribution-btn").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const id = btn.dataset.id;
+      const c = latestContributions.find((item) => item.id === id);
+      const label = c ? `${c.name} — ${formatBRL(c.amount)}` : "esta contribuição";
+      if (!confirm(`Tem certeza que quer apagar ${label}? Essa ação não pode ser desfeita.`)) return;
+      btn.disabled = true;
+      try {
+        await deleteContribution(id);
+        toast("Contribuição apagada.");
+      } catch (e) {
+        console.error("Erro ao apagar contribuição:", e);
+        toast("Erro ao apagar. Tente de novo.");
+        btn.disabled = false;
+      }
+    });
+  });
 }
 
 function startContributionsListener() {
