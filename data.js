@@ -20,6 +20,7 @@ const SITE_CONFIG = {
   pixKey: "85989625699",
   pixOwner: "Letícia & Agapito",
   suggestedAmounts: [100, 200],
+  couplePhoto: null, // definido pelo admin (upload) — se vazio, usa casal.jpg como padrão
 };
 
 const DEFAULT_ITEMS = [
