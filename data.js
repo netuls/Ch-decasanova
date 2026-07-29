@@ -17,7 +17,7 @@ const SITE_CONFIG = {
   location: "Condomínio Vistta Lagoon",
   intro:
     "Estamos montando nosso ninho e cada ajuda torna essa casa mais nossa. Escolha um item, contribua com o valor que puder e faça parte dessa nova fase com a gente!",
-  pixKey: "sua-chave-pix@exemplo.com",
+  pixKey: "85989625699",
   pixOwner: "Letícia & Agapito",
   whatsapp: "5585999999999",
   suggestedAmounts: [100, 200],
