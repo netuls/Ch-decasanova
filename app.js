@@ -40,8 +40,6 @@ function renderHero() {
   const cfg = getConfig();
   document.getElementById("hero-title").textContent = cfg.eventTitle;
   document.getElementById("hero-names").textContent = cfg.couple;
-  document.getElementById("hero-date").textContent = `${cfg.date} · ${cfg.time}`;
-  document.getElementById("hero-location").textContent = cfg.location;
   document.getElementById("hero-intro").textContent = cfg.intro;
   document.title = `${cfg.eventTitle} — ${cfg.couple}`;
 }
