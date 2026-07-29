@@ -10,7 +10,8 @@ import {
   saveRemoteConfig,
   saveRemoteItems,
   seedIfEmpty,
-} from "./firebase-config.js";
+  subscribeContributions,
+} from "./firebase-config.js?v=2";
 
 const ADMIN_PASSWORD = "casanova2026"; // troque aqui por sua senha
 
@@ -108,9 +109,6 @@ function renderConfigForm() {
     <label>Chave Pix
       <input type="text" data-field="pixKey" value="${workingConfig.pixKey}" />
     </label>
-    <label>WhatsApp (só números, com DDI)
-      <input type="text" data-field="whatsapp" value="${workingConfig.whatsapp}" />
-    </label>
   `;
   el.querySelectorAll("[data-field]").forEach((input) => {
     input.addEventListener("input", () => {
@@ -173,6 +171,59 @@ function renderItemsForm() {
   });
 }
 
+function formatBRL(value) {
+  return Number(value || 0).toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  });
+}
+
+function formatDate(timestamp) {
+  if (!timestamp) return "—";
+  return new Date(timestamp).toLocaleString("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+let contributionsUnsubscribe = null;
+
+function renderContributions(list) {
+  const tbody = document.getElementById("contributions-tbody");
+  const summary = document.getElementById("contributions-summary");
+
+  if (!list.length) {
+    tbody.innerHTML = `<tr><td colspan="4" class="empty-row">Nenhuma contribuição registrada ainda.</td></tr>`;
+    summary.textContent = "0 contribuições — total: R$ 0,00";
+    return;
+  }
+
+  const total = list.reduce((sum, c) => sum + Number(c.amount || 0), 0);
+  summary.textContent = `${list.length} contribuição${list.length > 1 ? "ões" : ""} — total: ${formatBRL(total)}`;
+
+  tbody.innerHTML = list
+    .map(
+      (c) => `
+    <tr>
+      <td>${c.name || "—"}</td>
+      <td>${c.itemName || "—"}</td>
+      <td>${formatBRL(c.amount)}</td>
+      <td>${formatDate(c.createdAt)}</td>
+    </tr>`
+    )
+    .join("");
+}
+
+function startContributionsListener() {
+  if (contributionsUnsubscribe) return;
+  contributionsUnsubscribe = subscribeContributions((list) => {
+    renderContributions(list);
+  });
+}
+
 async function checkPassword() {
   const input = document.getElementById("password-input").value;
   if (input === ADMIN_PASSWORD) {
@@ -182,6 +233,7 @@ async function checkPassword() {
     await loadState();
     renderConfigForm();
     renderItemsForm();
+    startContributionsListener();
   } else {
     document.getElementById("password-error").style.display = "block";
   }
