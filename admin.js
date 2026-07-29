@@ -1,30 +1,49 @@
 /* ==========================================================================
    admin.js
-   Painel do administrador. Roda inteiramente no navegador (sem servidor).
-   - As alterações ficam salvas no localStorage deste navegador (pré-visualização).
-   - Para valer para todos os visitantes, gere o código e cole em js/data.js
-     no repositório, depois faça commit/push.
+   Painel do administrador. As alterações são salvas direto no Firebase
+   (nuvem) e aparecem para todo mundo, em qualquer aparelho, na hora.
    ========================================================================== */
 
-const STORAGE_KEY = "cha_casa_nova_overrides_v1";
+import {
+  fetchRemoteConfig,
+  fetchRemoteItems,
+  saveRemoteConfig,
+  saveRemoteItems,
+  seedIfEmpty,
+} from "./firebase-config.js";
+
 const ADMIN_PASSWORD = "casanova2026"; // troque aqui por sua senha
 
 let workingItems = [];
 let workingConfig = {};
 
-function loadState() {
-  const raw = localStorage.getItem(STORAGE_KEY);
-  const overrides = raw ? JSON.parse(raw) : null;
-  workingItems = (overrides && overrides.items) || JSON.parse(JSON.stringify(DEFAULT_ITEMS));
-  workingConfig = { ...SITE_CONFIG, ...((overrides && overrides.config) || {}) };
+async function loadState() {
+  try {
+    await seedIfEmpty(SITE_CONFIG, DEFAULT_ITEMS);
+    const remoteConfig = await fetchRemoteConfig();
+    const remoteItems = await fetchRemoteItems();
+    workingConfig = { ...SITE_CONFIG, ...(remoteConfig || {}) };
+    workingItems = remoteItems.length
+      ? remoteItems
+      : JSON.parse(JSON.stringify(DEFAULT_ITEMS));
+  } catch (e) {
+    console.error("Erro ao carregar dados da nuvem:", e);
+    workingConfig = { ...SITE_CONFIG };
+    workingItems = JSON.parse(JSON.stringify(DEFAULT_ITEMS));
+    toast("Não consegui conectar à nuvem. Verifique sua internet.");
+  }
 }
 
-function saveState() {
-  localStorage.setItem(
-    STORAGE_KEY,
-    JSON.stringify({ items: workingItems, config: workingConfig })
-  );
-  toast("Alterações salvas neste navegador ✅");
+async function saveState() {
+  try {
+    toast("Salvando...");
+    await saveRemoteConfig(workingConfig);
+    await saveRemoteItems(workingItems);
+    toast("Salvo! Já aparece pra todo mundo, em qualquer aparelho ✅");
+  } catch (e) {
+    console.error("Erro ao salvar na nuvem:", e);
+    toast("Erro ao salvar. Verifique sua internet e tente de novo.");
+  }
 }
 
 function toast(msg) {
@@ -34,7 +53,7 @@ function toast(msg) {
   setTimeout(() => t.classList.remove("show"), 2400);
 }
 
-function resizeImage(file, maxWidth = 900, quality = 0.82) {
+function resizeImage(file, maxWidth = 700, quality = 0.7) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -145,34 +164,13 @@ function renderItemsForm() {
   });
 }
 
-function generateCode() {
-  const itemsCode = workingItems
-    .map(
-      (i) =>
-        `  { id: ${JSON.stringify(i.id)}, name: ${JSON.stringify(
-          i.name
-        )}, emoji: ${JSON.stringify(i.emoji || "🎁")}, image: ${
-          i.image ? JSON.stringify(i.image) : "null"
-        } },`
-    )
-    .join("\n");
-
-  const code = `const SITE_CONFIG = ${JSON.stringify(workingConfig, null, 2)};
-
-const DEFAULT_ITEMS = [
-${itemsCode}
-];
-`;
-  document.getElementById("code-output").value = code;
-  document.getElementById("code-output-wrap").style.display = "block";
-}
-
-function checkPassword() {
+async function checkPassword() {
   const input = document.getElementById("password-input").value;
   if (input === ADMIN_PASSWORD) {
     document.getElementById("login-screen").style.display = "none";
     document.getElementById("admin-panel").style.display = "block";
-    loadState();
+    document.getElementById("config-form").innerHTML = "<p>Carregando...</p>";
+    await loadState();
     renderConfigForm();
     renderItemsForm();
   } else {
@@ -180,13 +178,18 @@ function checkPassword() {
   }
 }
 
-function resetPreview() {
-  if (!confirm("Isso apaga a pré-visualização salva neste navegador e volta aos valores padrão de data.js. Continuar?")) return;
-  localStorage.removeItem(STORAGE_KEY);
-  loadState();
+function resetForm() {
+  if (
+    !confirm(
+      "Isso volta os campos para os valores padrão (não salva ainda — clique em Salvar depois se quiser aplicar). Continuar?"
+    )
+  )
+    return;
+  workingItems = JSON.parse(JSON.stringify(DEFAULT_ITEMS));
+  workingConfig = { ...SITE_CONFIG };
   renderConfigForm();
   renderItemsForm();
-  toast("Pré-visualização redefinida");
+  toast("Campos redefinidos (clique em Salvar para aplicar)");
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -195,13 +198,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.key === "Enter") checkPassword();
   });
   document.getElementById("save-preview-btn").addEventListener("click", saveState);
-  document.getElementById("generate-code-btn").addEventListener("click", generateCode);
-  document.getElementById("reset-btn").addEventListener("click", resetPreview);
-  document.getElementById("copy-code-btn").addEventListener("click", () => {
-    const ta = document.getElementById("code-output");
-    ta.select();
-    navigator.clipboard.writeText(ta.value).then(() => toast("Código copiado!"));
-  });
+  document.getElementById("reset-btn").addEventListener("click", resetForm);
   document.getElementById("view-site-btn").addEventListener("click", () => {
     window.open("index.html", "_blank");
   });
