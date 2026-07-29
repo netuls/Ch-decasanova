@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Administrador — Chá de Casa Nova</title>
+<link rel="stylesheet" href="css/style.css" />
+<link rel="stylesheet" href="css/admin.css" />
+</head>
+<body class="admin-body">
+
+<div class="login-screen" id="login-screen">
+  <div class="login-card">
+    <div class="eyebrow" style="margin-bottom:16px;">Área restrita</div>
+    <h1 style="font-family:'Mrs Saint Delafield',cursive; font-size:2.6rem; margin:0 0 6px; color:var(--pink-deep);">Painel do admin</h1>
+    <p style="color:var(--ink-soft); font-size:0.9rem; margin-bottom:20px;">Digite a senha para editar fotos, nomes e valores do chá.</p>
+    <input type="password" id="password-input" placeholder="Senha" class="login-input" />
+    <p id="password-error" style="display:none; color:#c0392b; font-size:0.82rem; margin-top:8px;">Senha incorreta, tente novamente.</p>
+    <button id="login-btn" class="contribute-btn" style="width:100%; margin-top:16px;">Entrar</button>
+  </div>
+</div>
+
+<div class="admin-panel" id="admin-panel" style="display:none;">
+  <div class="wrap admin-wrap">
+    <div class="admin-header">
+      <div>
+        <div class="eyebrow">Painel do administrador</div>
+        <h1 class="admin-title">Editar chá de casa nova</h1>
+      </div>
+      <div class="admin-actions">
+        <button id="view-site-btn" class="ghost-btn">Ver site</button>
+        <a href="index.html" class="ghost-btn">Sair</a>
+      </div>
+    </div>
+
+    <p class="admin-note">
+      As alterações abaixo ficam salvas <strong>apenas neste navegador</strong>, como pré-visualização.
+      Para que todo mundo veja as novidades no site publicado, clique em <strong>"Gerar código atualizado"</strong>,
+      copie o resultado e cole no arquivo <code>js/data.js</code> do seu repositório no GitHub — depois é só
+      salvar (commit) e enviar (push).
+    </p>
+
+    <section class="admin-section">
+      <h2>Informações do evento</h2>
+      <div class="config-grid" id="config-form"></div>
+    </section>
+
+    <section class="admin-section">
+      <h2>Itens e fotos</h2>
+      <div class="admin-items-list" id="items-form"></div>
+    </section>
+
+    <div class="admin-toolbar">
+      <button id="save-preview-btn" class="contribute-btn">Salvar pré-visualização</button>
+      <button id="generate-code-btn" class="ghost-btn">Gerar código atualizado</button>
+      <button id="reset-btn" class="ghost-btn danger">Redefinir</button>
+    </div>
+
+    <div class="code-output-wrap" id="code-output-wrap" style="display:none;">
+      <h2>Cole este código em <code>js/data.js</code></h2>
+      <textarea id="code-output" rows="14" readonly></textarea>
+      <button id="copy-code-btn" class="contribute-btn">Copiar código</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="admin-toast"></div>
+
+<script src="js/data.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>
