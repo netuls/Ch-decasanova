@@ -9,7 +9,7 @@ import {
   subscribeItems,
   seedIfEmpty,
   saveContribution,
-} from "./firebase-config.js";
+} from "./firebase-config.js?v=2";
 
 let currentConfig = SITE_CONFIG;
 let currentItems = DEFAULT_ITEMS;
