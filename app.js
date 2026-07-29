@@ -27,6 +27,10 @@ function renderHero() {
   document.getElementById("hero-names").textContent = cfg.couple;
   document.getElementById("hero-intro").textContent = cfg.intro;
   document.title = `${cfg.eventTitle} — ${cfg.couple}`;
+
+  const photoEl = document.getElementById("intro-photo");
+  photoEl.src = cfg.couplePhoto || "casal.jpg?v=1";
+  photoEl.alt = cfg.couple;
 }
 
 function itemMediaHTML(item) {
