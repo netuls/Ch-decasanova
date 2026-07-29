@@ -13,6 +13,8 @@ import {
   getDocs,
   setDoc,
   addDoc,
+  updateDoc,
+  deleteDoc,
   onSnapshot,
   collection,
   query,
@@ -96,6 +98,18 @@ export function subscribeContributions(callback) {
     snap.forEach((d) => list.push({ id: d.id, ...d.data() }));
     callback(list);
   });
+}
+
+// Edita uma contribuição já registrada (ex: corrigir nome, item ou valor).
+export async function updateContribution(id, changes) {
+  const ref = doc(db, "chaDeCasaNova", "config", "contributions", id);
+  await updateDoc(ref, changes);
+}
+
+// Apaga uma contribuição registrada.
+export async function deleteContribution(id) {
+  const ref = doc(db, "chaDeCasaNova", "config", "contributions", id);
+  await deleteDoc(ref);
 }
 
 // Na primeira vez que o site roda, se o banco ainda estiver vazio,
