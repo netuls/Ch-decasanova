@@ -157,8 +157,12 @@ function renderConfigForm() {
 function renderItemsForm() {
   const el = document.getElementById("items-form");
   el.innerHTML = workingItems
-    .map(
-      (item, idx) => `
+    .map((item, idx) => {
+      const itemAmounts =
+        item.amounts && item.amounts.length
+          ? item.amounts
+          : workingConfig.suggestedAmounts || [100, 200];
+      return `
     <div class="admin-item-card" data-idx="${idx}">
       <div class="admin-item-preview">
         ${
@@ -179,14 +183,36 @@ function renderItemsForm() {
             ? `<button type="button" class="remove-img-btn" data-idx="${idx}">Remover foto</button>`
             : ""
         }
+        <div class="item-amounts-row">
+          <label>Valor sugerido 1
+            <input type="number" min="0" step="1" class="item-amount-input" data-idx="${idx}" data-slot="0" value="${itemAmounts[0] ?? ""}" />
+          </label>
+          <label>Valor sugerido 2
+            <input type="number" min="0" step="1" class="item-amount-input" data-idx="${idx}" data-slot="1" value="${itemAmounts[1] ?? ""}" />
+          </label>
+        </div>
       </div>
-    </div>`
-    )
+    </div>`;
+    })
     .join("");
 
   el.querySelectorAll(".item-name-input").forEach((input) => {
     input.addEventListener("input", () => {
       workingItems[input.dataset.idx].name = input.value;
+    });
+  });
+
+  el.querySelectorAll(".item-amount-input").forEach((input) => {
+    input.addEventListener("input", () => {
+      const idx = input.dataset.idx;
+      const slot = Number(input.dataset.slot);
+      const item = workingItems[idx];
+      const base =
+        item.amounts && item.amounts.length
+          ? [...item.amounts]
+          : [...(workingConfig.suggestedAmounts || [100, 200])];
+      base[slot] = parseFloat(input.value) || 0;
+      item.amounts = base;
     });
   });
 
