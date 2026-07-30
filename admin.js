@@ -156,6 +156,13 @@ function renderConfigForm() {
 
 function renderItemsForm() {
   const el = document.getElementById("items-form");
+  // Normaliza itens antigos que ainda tenham 2 valores salvos na nuvem,
+  // garantindo que o modelo de dados sempre tenha só 1 valor sugerido.
+  workingItems.forEach((item) => {
+    if (item.amounts && item.amounts.length > 1) {
+      item.amounts = [item.amounts[0]];
+    }
+  });
   el.innerHTML = workingItems
     .map((item, idx) => {
       const itemAmounts =
