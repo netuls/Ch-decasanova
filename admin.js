@@ -356,19 +356,29 @@ function startContributionsListener() {
   });
 }
 
+async function enterAdminPanel() {
+  document.getElementById("login-screen").style.display = "none";
+  document.getElementById("admin-panel").style.display = "block";
+  document.getElementById("config-form").innerHTML = "<p>Carregando...</p>";
+  await loadState();
+  renderConfigForm();
+  renderItemsForm();
+  startContributionsListener();
+}
+
 async function checkPassword() {
   const input = document.getElementById("password-input").value;
   if (input === ADMIN_PASSWORD) {
-    document.getElementById("login-screen").style.display = "none";
-    document.getElementById("admin-panel").style.display = "block";
-    document.getElementById("config-form").innerHTML = "<p>Carregando...</p>";
-    await loadState();
-    renderConfigForm();
-    renderItemsForm();
-    startContributionsListener();
+    localStorage.setItem("casanova_admin_logado", "1");
+    await enterAdminPanel();
   } else {
     document.getElementById("password-error").style.display = "block";
   }
+}
+
+function sairAdmin() {
+  localStorage.removeItem("casanova_admin_logado");
+  location.reload();
 }
 
 function resetForm() {
@@ -395,4 +405,11 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("view-site-btn").addEventListener("click", () => {
     window.open("index.html", "_blank");
   });
+
+  const logoutBtn = document.getElementById("logout-btn");
+  if (logoutBtn) logoutBtn.addEventListener("click", sairAdmin);
+
+  if (localStorage.getItem("casanova_admin_logado") === "1") {
+    enterAdminPanel();
+  }
 });
