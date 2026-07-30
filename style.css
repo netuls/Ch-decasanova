@@ -796,6 +796,66 @@ html.no-scroll body {
   transform: translateX(-50%) translateY(0);
 }
 
+/* ---------- Botão de música ---------- */
+
+.music-toggle {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 80;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  background: linear-gradient(120deg, var(--pink-deep), var(--orange));
+  color: #fff;
+  box-shadow: var(--shadow-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.music-toggle:hover {
+  transform: translateY(-2px) scale(1.04);
+  box-shadow: 0 16px 34px -14px rgba(120, 70, 60, 0.45);
+}
+
+.music-toggle:active {
+  transform: translateY(0) scale(0.96);
+}
+
+.music-icon {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.music-icon-play {
+  display: block;
+}
+
+.music-icon-pause {
+  display: none;
+}
+
+.music-toggle.is-playing .music-icon-play {
+  display: none;
+}
+
+.music-toggle.is-playing .music-icon-pause {
+  display: block;
+}
+
+@media (max-width: 640px) {
+  .music-toggle {
+    bottom: 18px;
+    right: 18px;
+    width: 46px;
+    height: 46px;
+  }
+}
+
 /* ---------- Responsive ---------- */
 
 @media (max-width: 640px) {
