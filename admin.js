@@ -161,7 +161,7 @@ function renderItemsForm() {
       const itemAmounts =
         item.amounts && item.amounts.length
           ? item.amounts
-          : workingConfig.suggestedAmounts || [100, 200];
+          : workingConfig.suggestedAmounts || [100];
       return `
     <div class="admin-item-card" data-idx="${idx}">
       <div class="admin-item-preview">
@@ -184,11 +184,8 @@ function renderItemsForm() {
             : ""
         }
         <div class="item-amounts-row">
-          <label>Valor sugerido 1
+          <label>Valor sugerido
             <input type="number" min="0" step="1" class="item-amount-input" data-idx="${idx}" data-slot="0" value="${itemAmounts[0] ?? ""}" />
-          </label>
-          <label>Valor sugerido 2
-            <input type="number" min="0" step="1" class="item-amount-input" data-idx="${idx}" data-slot="1" value="${itemAmounts[1] ?? ""}" />
           </label>
         </div>
       </div>
@@ -205,14 +202,8 @@ function renderItemsForm() {
   el.querySelectorAll(".item-amount-input").forEach((input) => {
     input.addEventListener("input", () => {
       const idx = input.dataset.idx;
-      const slot = Number(input.dataset.slot);
       const item = workingItems[idx];
-      const base =
-        item.amounts && item.amounts.length
-          ? [...item.amounts]
-          : [...(workingConfig.suggestedAmounts || [100, 200])];
-      base[slot] = parseFloat(input.value) || 0;
-      item.amounts = base;
+      item.amounts = [parseFloat(input.value) || 0];
     });
   });
 
