@@ -82,7 +82,9 @@ function renderItems() {
   const grid = document.getElementById("items-grid");
   grid.innerHTML = items
     .map((item, idx) => {
-      const amounts = cfg.suggestedAmounts
+      const itemAmounts =
+        item.amounts && item.amounts.length ? item.amounts : cfg.suggestedAmounts;
+      const amounts = itemAmounts
         .map(
           (a) =>
             `<button class="amount-btn" data-amount="${a}" data-idx="${idx}">${formatBRL(
