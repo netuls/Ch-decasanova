@@ -21,6 +21,12 @@ import {
   orderBy,
   writeBatch,
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import {
+  getStorage,
+  ref,
+  uploadBytes,
+  getDownloadURL,
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCR9Q64qPoFnCVfP-pk8W2WXOMIqWfb2C4",
@@ -33,6 +39,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
+const storage = getStorage(app);
 
 const configDocRef = doc(db, "chaDeCasaNova", "config");
 const itemsColRef = collection(db, "chaDeCasaNova", "config", "items");
@@ -110,6 +117,16 @@ export async function updateContribution(id, changes) {
 export async function deleteContribution(id) {
   const ref = doc(db, "chaDeCasaNova", "config", "contributions", id);
   await deleteDoc(ref);
+}
+
+// Envia um arquivo de música pro Firebase Storage e devolve o link público
+// pra ser salvo na configuração (musicUrl).
+export async function uploadMusicFile(file) {
+  const safeName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, "_");
+  const path = `music/${Date.now()}_${safeName}`;
+  const fileRef = ref(storage, path);
+  await uploadBytes(fileRef, file);
+  return getDownloadURL(fileRef);
 }
 
 // Na primeira vez que o site roda, se o banco ainda estiver vazio,
