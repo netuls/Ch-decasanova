@@ -96,7 +96,7 @@ function renderConfigForm() {
           ${
             workingConfig.couplePhoto
               ? `<img src="${workingConfig.couplePhoto}" alt="Foto do casal" />`
-              : `<img src="casal.jpg?v=1" alt="Foto padrão" />`
+              : `<img src="casal.jpg?v=2" alt="Foto padrão" />`
           }
         </div>
         <div class="couple-photo-actions">
