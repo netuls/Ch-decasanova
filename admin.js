@@ -13,6 +13,7 @@ import {
   subscribeContributions,
   updateContribution,
   deleteContribution,
+  uploadMusicFile,
 } from "./firebase-config.js?v=3";
 
 const ADMIN_PASSWORD = "casanova2026"; // troque aqui por sua senha
@@ -130,11 +131,69 @@ function renderConfigForm() {
     <label>Chave Pix
       <input type="text" data-field="pixKey" value="${workingConfig.pixKey}" />
     </label>
+    <label class="full">
+      <span class="music-field-label">
+        <input type="checkbox" id="music-enabled-input" ${workingConfig.musicEnabled ? "checked" : ""} />
+        Tocar música de fundo no site
+      </span>
+    </label>
+    <label class="full">Enviar arquivo de música (mp3)
+      <input type="file" accept="audio/*" id="music-file-input" />
+      <span class="music-hint" id="music-upload-status">
+        Escolha um arquivo do seu computador — ele sobe automaticamente e o link é preenchido sozinho.
+      </span>
+    </label>
+    <label class="full">Ou cole um link direto para um mp3
+      <input type="text" data-field="musicUrl" id="music-url-input" placeholder="ex: https://..." value="${workingConfig.musicUrl || ""}" />
+    </label>
+    <div class="full music-preview-wrap" id="music-preview-wrap">
+      ${
+        workingConfig.musicUrl
+          ? `<audio controls src="${workingConfig.musicUrl}" id="music-preview-player" style="width:100%"></audio>`
+          : `<span class="music-hint">Nenhuma música definida ainda.</span>`
+      }
+    </div>
   `;
   el.querySelectorAll("[data-field]").forEach((input) => {
     input.addEventListener("input", () => {
       workingConfig[input.dataset.field] = input.value;
     });
+  });
+
+  document.getElementById("music-enabled-input").addEventListener("change", (e) => {
+    workingConfig.musicEnabled = e.target.checked;
+  });
+
+  const musicUrlInput = document.getElementById("music-url-input");
+  musicUrlInput.addEventListener("change", () => {
+    workingConfig.musicUrl = musicUrlInput.value.trim();
+    renderConfigForm();
+  });
+
+  const musicFileInput = document.getElementById("music-file-input");
+  const musicStatus = document.getElementById("music-upload-status");
+  musicFileInput.addEventListener("change", async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (file.size > 15 * 1024 * 1024) {
+      musicStatus.textContent = "Arquivo muito grande (máx. 15MB). Escolha um arquivo menor.";
+      return;
+    }
+
+    musicStatus.textContent = "Enviando música...";
+    musicFileInput.disabled = true;
+    try {
+      const url = await uploadMusicFile(file);
+      workingConfig.musicUrl = url;
+      workingConfig.musicEnabled = true;
+      toast("Música enviada! Clique em Salvar alterações pra aplicar no site.");
+      renderConfigForm();
+    } catch (err) {
+      console.error("Erro ao enviar música:", err);
+      musicStatus.textContent = "Erro ao enviar. Verifique sua internet e tente de novo.";
+      musicFileInput.disabled = false;
+    }
   });
 
   document.getElementById("couple-photo-input").addEventListener("change", async (e) => {
