@@ -514,6 +514,23 @@ html.no-scroll body {
   width: fit-content;
 }
 
+.value-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.value-row .amount-row {
+  flex: 1;
+  min-width: 90px;
+}
+
+.value-row .custom-amount {
+  flex: 1;
+  min-width: 90px;
+}
+
 .amount-row {
   display: flex;
   gap: 8px;
