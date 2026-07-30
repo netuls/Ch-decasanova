@@ -102,11 +102,13 @@ function renderItems() {
         <div class="item-media">${itemMediaHTML(item)}</div>
         <div class="item-body">
           <div class="item-name">${item.name}</div>
-          <div class="amount-row">${amounts}</div>
-          <label class="custom-amount">
-            <span>R$</span>
-            <input type="number" min="1" step="1" placeholder="Outro valor" class="custom-input" data-idx="${idx}" />
-          </label>
+          <div class="value-row">
+            <div class="amount-row">${amounts}</div>
+            <label class="custom-amount">
+              <span>R$</span>
+              <input type="number" min="1" step="1" placeholder="Outro valor" class="custom-input" data-idx="${idx}" />
+            </label>
+          </div>
           <button class="contribute-btn" data-idx="${idx}">Contribuir</button>
         </div>
       </article>`;
