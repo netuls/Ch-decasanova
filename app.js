@@ -34,7 +34,7 @@ function renderHero() {
   if (splashTitle) splashTitle.textContent = cfg.eventTitle;
   if (splashNames) splashNames.textContent = cfg.couple;
   if (splashPhoto) {
-    splashPhoto.src = cfg.couplePhoto || "casal.jpg?v=1";
+    splashPhoto.src = cfg.couplePhoto || "casal.jpg?v=2";
     splashPhoto.alt = cfg.couple;
   }
 }
