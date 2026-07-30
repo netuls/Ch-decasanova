@@ -76,6 +76,11 @@ function itemMediaHTML(item) {
   return `<span>${item.emoji || "🎁"}</span>`;
 }
 
+function renderItemsLoading() {
+  const grid = document.getElementById("items-grid");
+  grid.innerHTML = `<p class="items-loading" style="grid-column:1/-1; text-align:center; opacity:0.6; padding:24px 0;">Carregando itens…</p>`;
+}
+
 function renderItems() {
   const items = currentItems;
   const cfg = currentConfig;
@@ -217,9 +222,11 @@ function copyPix() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  // Mostra os dados padrão imediatamente, enquanto busca os dados da nuvem
+  // Mostra o título/nomes padrão imediatamente (texto não gera "flash" visual),
+  // mas os itens ficam em estado de carregamento até os dados reais da nuvem
+  // chegarem — evita mostrar fotos/valores antigos ou genéricos por um instante.
   renderHero();
-  renderItems();
+  renderItemsLoading();
   initSplash();
 
   // Listeners essenciais de UI: registrados JÁ, sem depender da nuvem,
@@ -243,12 +250,23 @@ document.addEventListener("DOMContentLoaded", () => {
   initCloud();
 });
 
+let itemsLoaded = false;
+
 async function initCloud() {
   try {
     await seedIfEmpty(SITE_CONFIG, DEFAULT_ITEMS);
   } catch (e) {
     console.error("Erro ao inicializar dados na nuvem:", e);
   }
+
+  // Se a nuvem demorar demais (ex: sem internet), mostra os itens padrão
+  // depois de um tempo em vez de deixar o "Carregando…" travado pra sempre.
+  setTimeout(() => {
+    if (!itemsLoaded) {
+      itemsLoaded = true;
+      renderItems();
+    }
+  }, 4000);
 
   // Atualiza em tempo real sempre que algo mudar no admin
   subscribeConfig((cfg) => {
@@ -257,6 +275,7 @@ async function initCloud() {
   });
   subscribeItems((items) => {
     currentItems = items.length ? items : DEFAULT_ITEMS;
+    itemsLoaded = true;
     renderItems();
   });
 }
