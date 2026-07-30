@@ -39,6 +39,56 @@ function renderHero() {
   }
 }
 
+/* ---------- Música de fundo ---------- */
+
+function initMusic() {
+  const music = document.getElementById("bg-music");
+  const btn = document.getElementById("music-toggle");
+  if (!music || !btn) return;
+
+  const updateBtnState = (isPlaying) => {
+    btn.classList.toggle("is-playing", isPlaying);
+    btn.setAttribute("aria-pressed", String(isPlaying));
+    btn.setAttribute("aria-label", isPlaying ? "Pausar música" : "Tocar música");
+  };
+
+  const playMusic = () => {
+    music.play().then(() => updateBtnState(true)).catch(() => updateBtnState(false));
+  };
+
+  const pauseMusic = () => {
+    music.pause();
+    updateBtnState(false);
+  };
+
+  btn.addEventListener("click", () => {
+    if (music.paused) {
+      playMusic();
+    } else {
+      pauseMusic();
+    }
+  });
+
+  // Tenta iniciar a música assim que a pessoa interage com a tela de abertura
+  // (navegadores exigem um gesto do usuário antes de tocar áudio com som)
+  document.addEventListener(
+    "click",
+    () => {
+      if (music.paused && !music.dataset.userPaused) {
+        playMusic();
+      }
+    },
+    { once: true }
+  );
+
+  music.addEventListener("pause", () => {
+    if (music.dataset.userPaused === undefined) music.dataset.userPaused = "";
+  });
+  music.addEventListener("play", () => {
+    delete music.dataset.userPaused;
+  });
+}
+
 function initSplash() {
   const splash = document.getElementById("splash");
   const enterBtn = document.getElementById("splash-enter");
@@ -230,6 +280,7 @@ document.addEventListener("DOMContentLoaded", () => {
   renderHero();
   renderItemsLoading();
   initSplash();
+  initMusic();
 
   // Listeners essenciais de UI: registrados JÁ, sem depender da nuvem,
   // pra nunca ficar "travado" esperando o Firebase responder.
