@@ -21,6 +21,8 @@ const SITE_CONFIG = {
   pixOwner: "Letícia & Agapito",
   suggestedAmounts: [100],
   couplePhoto: null, // definido pelo admin (upload) — se vazio, usa casal.jpg como padrão
+  musicEnabled: true, // liga/desliga a música de fundo
+  musicUrl: "music.mp3", // caminho ou link do arquivo de música
 };
 
 const DEFAULT_ITEMS = [
