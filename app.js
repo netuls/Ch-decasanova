@@ -37,6 +37,11 @@ function renderHero() {
     splashPhoto.src = cfg.couplePhoto || "casal.jpg?v=2";
     splashPhoto.alt = cfg.couple;
   }
+
+  const music = document.getElementById("bg-music");
+  if (music && music.__applyMusicConfig) {
+    music.__applyMusicConfig(cfg);
+  }
 }
 
 /* ---------- Música de fundo ---------- */
@@ -45,6 +50,31 @@ function initMusic() {
   const music = document.getElementById("bg-music");
   const btn = document.getElementById("music-toggle");
   if (!music || !btn) return;
+
+  const applyMusicConfig = (cfg) => {
+    const enabled = cfg.musicEnabled !== false; // padrão: ligado
+    const url = cfg.musicUrl || "music.mp3";
+
+    if (!enabled) {
+      music.pause();
+      music.removeAttribute("src");
+      btn.style.display = "none";
+      return;
+    }
+
+    btn.style.display = "flex";
+    // só troca o src se realmente mudou, pra não reiniciar a música à toa
+    const resolvedUrl = new URL(url, window.location.href).href;
+    if (music.dataset.currentUrl !== resolvedUrl) {
+      const wasPlaying = !music.paused;
+      music.src = url;
+      music.dataset.currentUrl = resolvedUrl;
+      if (wasPlaying) music.play().catch(() => {});
+    }
+  };
+
+  applyMusicConfig(currentConfig);
+  music.__applyMusicConfig = applyMusicConfig;
 
   const updateBtnState = (isPlaying) => {
     btn.classList.toggle("is-playing", isPlaying);
