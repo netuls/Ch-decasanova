@@ -51,9 +51,10 @@ function initMusic() {
   const btn = document.getElementById("music-toggle");
   if (!music || !btn) return;
 
+  const DEFAULT_MUSIC_SRC = "music.mp3";
+
   const applyMusicConfig = (cfg) => {
     const enabled = cfg.musicEnabled !== false; // padrão: ligado
-    const url = cfg.musicUrl || "music.mp3";
 
     if (!enabled) {
       music.pause();
@@ -63,13 +64,8 @@ function initMusic() {
     }
 
     btn.style.display = "flex";
-    // só troca o src se realmente mudou, pra não reiniciar a música à toa
-    const resolvedUrl = new URL(url, window.location.href).href;
-    if (music.dataset.currentUrl !== resolvedUrl) {
-      const wasPlaying = !music.paused;
-      music.src = url;
-      music.dataset.currentUrl = resolvedUrl;
-      if (wasPlaying) music.play().catch(() => {});
+    if (!music.getAttribute("src")) {
+      music.src = DEFAULT_MUSIC_SRC;
     }
   };
 
